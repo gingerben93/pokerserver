@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+# bake_require github.com/kyleburton/bake-recipes/docker/docker.sh
+
+bake_task get-started "Get started by editing this Bakefile"
+function get-started () {
+  if [ -n "vi" ]; then
+    "vi" Bakefile
+  else
+    vim Bakefile
+  fi
+}
+
+bake_task build "build docker container"
+function build(){
+  docker build -t poker_server:latest .
+}
+
+bake_task run "run docker container"
+function run(){
+  docker-compose up
+ # docker run --rm -it --name poker_server\
+ #   -v "$PWD:/app" \
+ #   -p 5000:5001 \
+ #   poker_server:latest "$@"
+}
+
+bake_task exec "exec into running docker container"
+function exec(){
+  docker exec -it poker_server "$@"
+}

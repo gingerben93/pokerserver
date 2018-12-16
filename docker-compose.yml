@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  pokerserver:
+    build: .
+    image: pokerserver:latest
+    stdin_open: true
+    tty: true
+    volumes:
+      - "$PWD:/app"
+    ports:
+      - 5000:5000
+  pokerdb:
+    image: postgres:10
+    ports:
+      - 5001:5001
+    environment:
+      POSTGRES_PASSWORD: password
+
