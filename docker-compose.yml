@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  pokerserver:
+  app:
     build: .
     image: pokerserver:latest
     stdin_open: true
@@ -10,10 +10,12 @@ services:
       - "$PWD:/app"
     ports:
       - 5000:5000
-  pokerdb:
+    depends_on:
+      - db
+
+  db:
     image: postgres:10
     ports:
-      - 5001:5001
+      - 5432:5432
     environment:
       POSTGRES_PASSWORD: password
-
