@@ -133,6 +133,9 @@ def find_player_hand_types(community_cards, player_hand):
                   player_hand.hand[6]]
 
         top_hand = what_is_hand(top)
+        print(top_hand.type)
+        for c in top_hand.hand:
+            print(c.value, c.suit)
 
 def find_flush(list_cards):
     list_spades = []
@@ -197,13 +200,13 @@ def find_duplicates(list_cards, num_dup):
     for x in list_cards:
         for y in list_cards:
             if x.value == y.value:
-                print(x.value)
                 list_dups.append(y)
                 cur_num_dups += 1
             if cur_num_dups == num_dup:
                 return list_dups
         list_dups = []
         cur_num_dups = 0
+    return None
 
 def get_unique_list(list_cards_a, list_cards_b):
     for c in list_cards_a:
@@ -230,37 +233,56 @@ def what_is_hand(list_cards):
     if list_dups_4kind != None:
         #found 4 kind so add next highest card
         list_remainer_cards = get_unique_list(list_dups_4kind, list_cards)
-        return list_dups_4kind
+        list_dups_4kind.append(list_remainer_cards[0])
+        return Hand(list_dups_4kind, HandType.FourKind)
 
     #check for full house
-    list_dups_3kind = []
     list_dups_3kind = find_duplicates(list_cards, 3)
     if list_dups_3kind != None:
-        return list_dups_3kind
+        list_remainer_cards = get_unique_list(list_dups_3kind, list_cards)
+        list_dups_2kind = find_duplicates(list_remainer_cards, 2)
+        if list_dups_2kind != None:
+            list_fullhouse = list_dups_3kind + list_dups_2kind
+            return Hand(list_fullhouse, HandType.FullHouse)
 
     #check for flush
     if list_flush != None:
-        return list_flush
+        return Hand(list_flush[:5], HandType.Flush)
 
     #check for straight
-    list_straight = []
     list_straight = find_straight(list_cards)
     if list_straight != None:
-        return list_straight
+        return Hand(list_straight[:5], HandType.Stright)
 
     #check for 3 kind
-    #check for two pair
-    #check for pair
-    #check for high card
+    if list_dups_3kind != None:
+        list_remainer_cards = get_unique_list(list_dups_3kind, list_cards)
+        return Hand(list_dups_3kind + list_remainer_cards[:2], HandType.Stright)
 
-    return list_cards
+    #check for two pair
+    list_dups_2kind_1 = find_duplicates(list_cards, 2)
+    if list_dups_2kind_1 != None:
+        list_remainer_cards = get_unique_list(list_dups_2kind_1, list_cards)
+        list_dups_2kind_2 = find_duplicates(list_remainer_cards, 2)
+        if list_dups_2kind_2 != None:
+            list_remainer_cards_2 = get_unique_list(list_dups_2kind_2, list_remainer_cards)
+            list_2pair = list_dups_2kind_1 + list_dups_2kind_2 + list_remainer_cards_2[:1]
+            return Hand(list_2pair, HandType.TwoPair)
+
+    #check for pair
+    if list_dups_2kind_1 != None:
+        list_remainer_cards = get_unique_list(list_dups_2kind_1, list_cards)
+        return Hand(list_dups_2kind_1 + list_remainer_cards[:3], HandType.Pair)
+
+    #check for high card
+    return Hand(list_cards[:5], HandType.HighCard)
 
 test_community_cards = []
-test_community_cards.append(Card(Number(9),Suit(0)))
-test_community_cards.append(Card(Number(9),Suit(1)))
-test_community_cards.append(Card(Number(9),Suit(2)))
-test_community_cards.append(Card(Number(3),Suit(1)))
+test_community_cards.append(Card(Number(5),Suit(0)))
 test_community_cards.append(Card(Number(1),Suit(1)))
+test_community_cards.append(Card(Number(7),Suit(2)))
+test_community_cards.append(Card(Number(9),Suit(1)))
+test_community_cards.append(Card(Number(7),Suit(1)))
 
-player_hand = make_player_hands([9,3,2,6,8,10,12],[3,2,2,2,2,2,0])
+player_hand = make_player_hands([2,4,2,6,8,10,12],[3,2,2,2,2,2,0])
 find_player_hand_types(test_community_cards, player_hand)
