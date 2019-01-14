@@ -69,73 +69,101 @@ def make_player_hands(list_number, list_suit):
 
 #takes two list of cards
 def find_player_hand_types(community_cards, player_hand):
-        top = [community_cards[0],
-               community_cards[1],
-               community_cards[2],
-               community_cards[3],
-               community_cards[4],
-               player_hand.hand[0]]
+    top = [community_cards[0],
+           community_cards[1],
+           community_cards[2],
+           community_cards[3],
+           community_cards[4],
+           player_hand.hand[0]]
 
-        middle = [community_cards[0],
-                  community_cards[1],
-                  community_cards[2],
-                  community_cards[3],
-                  community_cards[4],
-                  player_hand.hand[1],
-                  player_hand.hand[2]]
+    middle = [community_cards[0],
+              community_cards[1],
+              community_cards[2],
+              community_cards[3],
+              community_cards[4],
+              player_hand.hand[1],
+              player_hand.hand[2]]
 
-        bottom1 = [community_cards[0],
-                  community_cards[1],
-                  community_cards[2],
-                  community_cards[3],
-                  community_cards[4],
-                  player_hand.hand[3],
-                  player_hand.hand[4]]
+    bottom1 = [community_cards[0],
+              community_cards[1],
+              community_cards[2],
+              community_cards[3],
+              community_cards[4],
+              player_hand.hand[3],
+              player_hand.hand[4]]
 
-        bottom2 = [community_cards[0],
-                  community_cards[1],
-                  community_cards[2],
-                  community_cards[3],
-                  community_cards[4],
-                  player_hand.hand[3],
-                  player_hand.hand[5]]
+    bottom2 = [community_cards[0],
+              community_cards[1],
+              community_cards[2],
+              community_cards[3],
+              community_cards[4],
+              player_hand.hand[3],
+              player_hand.hand[5]]
 
-        bottom3 = [community_cards[0],
-                  community_cards[1],
-                  community_cards[2],
-                  community_cards[3],
-                  community_cards[4],
-                  player_hand.hand[3],
-                  player_hand.hand[6]]
+    bottom3 = [community_cards[0],
+              community_cards[1],
+              community_cards[2],
+              community_cards[3],
+              community_cards[4],
+              player_hand.hand[3],
+              player_hand.hand[6]]
 
-        bottom4 = [community_cards[0],
-                  community_cards[1],
-                  community_cards[2],
-                  community_cards[3],
-                  community_cards[4],
-                  player_hand.hand[4],
-                  player_hand.hand[5]]
+    bottom4 = [community_cards[0],
+              community_cards[1],
+              community_cards[2],
+              community_cards[3],
+              community_cards[4],
+              player_hand.hand[4],
+              player_hand.hand[5]]
 
-        bottom5 = [community_cards[0],
-                  community_cards[1],
-                  community_cards[2],
-                  community_cards[3],
-                  community_cards[4],
-                  player_hand.hand[4],
-                  player_hand.hand[6]]
+    bottom5 = [community_cards[0],
+              community_cards[1],
+              community_cards[2],
+              community_cards[3],
+              community_cards[4],
+              player_hand.hand[4],
+              player_hand.hand[6]]
 
-        bottom6 = [community_cards[0],
-                  community_cards[1],
-                  community_cards[2],
-                  community_cards[3],
-                  community_cards[4],
-                  player_hand.hand[5],
-                  player_hand.hand[6]]
+    bottom6 = [community_cards[0],
+              community_cards[1],
+              community_cards[2],
+              community_cards[3],
+              community_cards[4],
+              player_hand.hand[5],
+              player_hand.hand[6]]
 
-        top_hand = what_is_hand(top)
-        print(top_hand.type)
-        for c in top_hand.hand:
-            print(c.value, c.suit)
+    top_hand = what_is_hand(top)
+    middle_hand = what_is_hand(middle)
+    bottom_hand1 = what_is_hand(bottom1)
+    bottom_hand2 = what_is_hand(bottom2)
+    bottom_hand3 = what_is_hand(bottom3)
+    bottom_hand4 = what_is_hand(bottom4)
+    bottom_hand5 = what_is_hand(bottom5)
+    bottom_hand6 = what_is_hand(bottom6)
+
+    list_bottom_hands  = []
+    list_bottom_hands.append(bottom_hand1)
+    list_bottom_hands.append(bottom_hand2)
+    list_bottom_hands.append(bottom_hand3)
+    list_bottom_hands.append(bottom_hand4)
+    list_bottom_hands.append(bottom_hand5)
+    list_bottom_hands.append(bottom_hand6)
+
+    list_best_hands_bottom = find_best_hand(list_bottom_hands)
+
+    player_temp = Player(top_hand, middle_hand, list_best_hands_bottom[0])
+
+    print("------------------------------")
+    for i in player_temp.top.hand:
+        print(i.value, i.suit)
+    print("------------------------------")
+    for i in player_temp.middle.hand:
+        print(i.value, i.suit)
+    print("------------------------------")
+    for i in player_temp.bottom.hand:
+        print(i.value, i.suit)
+    return player_temp
+
 
 def find_flush(list_cards):
     list_spades = []
@@ -219,7 +247,6 @@ def what_is_hand(list_cards):
     list_cards = sort_cards(list_cards)
 
     list_flush = find_flush(list_cards)
-    print("------------------------------")
 
     #check for royal list_flush
     if list_flush != None:
@@ -277,6 +304,42 @@ def what_is_hand(list_cards):
     #check for high card
     return Hand(list_cards[:5], HandType.HighCard)
 
+#takes list hands returns best hand
+def find_best_hand(list_hands):
+    list_best_hands = []
+    for h in list_hands:
+        if len(list_best_hands) == 0:
+            list_best_hands.append(h)
+        elif list_best_hands[0].type.value < h.type.value:
+            list_best_hands = []
+            list_best_hands.append(h)
+        elif list_best_hands[0].type.value == h.type.value:
+            same_hand = True
+            for i in range(len(list_best_hands[0].hand)):
+                if list_best_hands[0].hand[i].value.value < h.hand[i].value.value:
+                    list_best_hands = []
+                    list_best_hands.append(h)
+                    same_hand = False
+                    break
+            if same_hand:
+                list_best_hands.append(h)
+        else:
+            continue
+
+    return list_best_hands
+
+def find_winning_player(list_players):
+    if list_players == None:
+        print("something wnet so so wrong")
+    list_top_hands = []
+    list_middle_hands = []
+    list_bottom_hands = []
+    for p in list_players:
+        list_top_hands.append(p.top)
+        list_middle_hands.append(p.middle)
+        list_bottom_hands.append(p.bottom)
+
+#for testing make community cards
 test_community_cards = []
 test_community_cards.append(Card(Number(5),Suit(0)))
 test_community_cards.append(Card(Number(1),Suit(1)))
@@ -284,5 +347,14 @@ test_community_cards.append(Card(Number(7),Suit(2)))
 test_community_cards.append(Card(Number(9),Suit(1)))
 test_community_cards.append(Card(Number(7),Suit(1)))
 
-player_hand = make_player_hands([2,4,2,6,8,10,12],[3,2,2,2,2,2,0])
-find_player_hand_types(test_community_cards, player_hand)
+#make players
+list_players = []
+player_hand1 = make_player_hands([2,2,2,2,2,2,2],[2,2,2,2,2,2,2])
+player_hand2 = make_player_hands([3,3,3,3,3,3,3],[3,3,3,3,3,3,3])
+
+list_players.append(find_player_hand_types(test_community_cards, player_hand1))
+list_players.append(find_player_hand_types(test_community_cards, player_hand2))
+
+find_winning_player(list_players)
+
+#test players
