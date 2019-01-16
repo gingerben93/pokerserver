@@ -43,7 +43,8 @@ class Hand:
         self.type = type
 
 class Player:
-    def __init__(self, top = None, middle = None, bottom = None):
+    def __init__(self, name = None, top = None, middle = None, bottom = None):
+        self.name = name
         self.top = top
         self.middle = middle
         self.bottom = bottom
@@ -68,7 +69,7 @@ def make_player_hands(list_number, list_suit):
     return player_hand
 
 #takes two list of cards
-def find_player_hand_types(community_cards, player_hand):
+def find_player_hand_types(community_cards, player_hand, player_name):
     top = [community_cards[0],
            community_cards[1],
            community_cards[2],
@@ -151,8 +152,9 @@ def find_player_hand_types(community_cards, player_hand):
 
     list_best_hands_bottom = find_best_hand(list_bottom_hands)
 
-    player_temp = Player(top_hand, middle_hand, list_best_hands_bottom[0])
+    player_temp = Player(player_name, top_hand, middle_hand, list_best_hands_bottom[0])
 
+    print(player_name)
     print("------------------------------")
     for i in player_temp.top.hand:
         print(i.value, i.suit)
@@ -307,22 +309,22 @@ def what_is_hand(list_cards):
 #takes list hands returns best hand
 def find_best_hand(list_hands):
     list_best_hands = []
-    for h in list_hands:
+    for h in range(len(list_hands)):
         if len(list_best_hands) == 0:
-            list_best_hands.append(h)
-        elif list_best_hands[0].type.value < h.type.value:
+            list_best_hands.append(list_hands[h])
+        elif list_best_hands[0].type.value < list_hands[h].type.value:
             list_best_hands = []
-            list_best_hands.append(h)
-        elif list_best_hands[0].type.value == h.type.value:
+            list_best_hands.append(list_hands[h])
+        elif list_best_hands[0].type.value == list_hands[h].type.value:
             same_hand = True
             for i in range(len(list_best_hands[0].hand)):
-                if list_best_hands[0].hand[i].value.value < h.hand[i].value.value:
+                if list_best_hands[0].hand[i].value.value < list_hands[h].hand[i].value.value:
                     list_best_hands = []
-                    list_best_hands.append(h)
+                    list_best_hands.append(list_hands[h])
                     same_hand = False
                     break
             if same_hand:
-                list_best_hands.append(h)
+                list_best_hands.append(list_hands[h])
         else:
             continue
 
@@ -339,6 +341,39 @@ def find_winning_player(list_players):
         list_middle_hands.append(p.middle)
         list_bottom_hands.append(p.bottom)
 
+    #make a 'super player'; has all winning hands
+    best_top = find_best_hand(list_top_hands)
+    best_middle = find_best_hand(list_middle_hands)
+    best_bottom = find_best_hand(list_bottom_hands)
+
+    print("BEST")
+    print("------------------------------")
+    for i in best_top[0].hand:
+        print(i.value, i.suit)
+    print("------------------------------")
+    for i in best_middle[0].hand:
+        print(i.value, i.suit)
+    print("------------------------------")
+    for i in best_bottom[0].hand:
+        print(i.value, i.suit)
+
+    #compare players to super player; print if the tie/win or lose against super player
+    for p in list_players:
+        print("------------------------------")
+        win = True
+        print(p.name)
+        print(p.top.type)
+        print(best_top[0].type)
+        if p.top.type == best_top[0].type:
+            for c in range(len(p.top.hand)):
+                if p.top.hand[c].value.value < best_top[0].hand[c].value.value:
+                    print("lose")
+                    win = False
+            if win:
+                print("win")
+        else:
+            print("lose")
+
 #for testing make community cards
 test_community_cards = []
 test_community_cards.append(Card(Number(5),Suit(0)))
@@ -349,11 +384,11 @@ test_community_cards.append(Card(Number(7),Suit(1)))
 
 #make players
 list_players = []
-player_hand1 = make_player_hands([2,2,2,2,2,2,2],[2,2,2,2,2,2,2])
+player_hand1 = make_player_hands([1,2,2,2,2,2,2],[2,2,2,2,2,2,2])
 player_hand2 = make_player_hands([3,3,3,3,3,3,3],[3,3,3,3,3,3,3])
 
-list_players.append(find_player_hand_types(test_community_cards, player_hand1))
-list_players.append(find_player_hand_types(test_community_cards, player_hand2))
+list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1"))
+list_players.append(find_player_hand_types(test_community_cards, player_hand2, "player2"))
 
 find_winning_player(list_players)
 

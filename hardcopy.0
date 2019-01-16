@@ -1,0 +1,67 @@
+  " Press ? for help             309 #takes list hands returns best hand
+                                 310 def find_best_hand(list_hands):
+  .. (up a dir)                  311     list_best_hands = []
+  </gingerben93/pokerserver/   ~ 312     for h in range(len(list_hands)):
+  ¾ src/                         313         if len(list_best_hands) == 0:
+      app.py                   ~ 314             list_best_hands.append(list_hands[h])
+      database.py              ~ 315         elif list_best_hands[0].type.value < list_hands[h].type.value:
+      pokerRuleLogic.py          316             list_best_hands = []
+    Bakefile                   ~ 317             list_best_hands.append(list_hands[h])
+    docker-compose.yml         ~ 318         elif list_best_hands[0].type.value == list_hands[h].type.value:
+    Dockerfile                   319             same_hand = True
+    README.md                    320             for i in range(len(list_best_hands[0].hand)):
+    requirements.txt           ~ 321                 if list_best_hands[0].hand[i].value.value < list_hands[h].hand[i].value.value:
+  ~                              322                     list_best_hands = []
+  ~                            ~ 323                     list_best_hands.append(list_hands[h])
+  ~                              324                     same_hand = False
+  ~                              325                     break
+  ~                              326             if same_hand:
+  ~                            ~ 327                 list_best_hands.append(list_hands[h])
+  ~                              328         else:
+  ~                              329             continue
+  ~                              330
+  ~                              331     return list_best_hands
+  ~                              332
+  ~                              333 def find_winning_player(list_players):
+  ~                              334     if list_players == None:
+  ~                              335         print("something wnet so so wrong")
+  ~                              336     list_top_hands = []
+  ~                              337     list_middle_hands = []
+  ~                              338     list_bottom_hands = []
+  ~                              339     for p in list_players:
+  ~                              340         list_top_hands.append(p.top)
+  ~                              341         list_middle_hands.append(p.middle)
+  ~                              342         list_bottom_hands.append(p.bottom)
+  ~                              343
+  ~                            + 344     best_top = find_best_hand(list_top_hands)
+  ~                            + 345     best_middle = find_best_hand(list_middle_hands)
+  ~                            + 346     best_bottom = find_best_hand(list_bottom_hands)
+  ~                            + 347
+  ~                            + 348     print("BEST")
+  ~                            + 349     print("------------------------------")
+  ~                            + 350     for i in best_top[0].hand:
+  ~                            + 351         print(i.value, i.suit)
+  ~                            + 352     print("------------------------------")
+  ~                            + 353     for i in best_middle[0].hand:
+  ~                            + 354         print(i.value, i.suit)
+  ~                            + 355     print("------------------------------")
+  ~                            + 356     for i in best_bottom[0].hand:
+  ~                            + 357         print(i.value, i.suit)
+  ~                            + 358
+  ~                            + 359     for p in list_players:
+  ~                            + 360         win = True
+  ~                            + 361         print(p.top.type)
+  ~                            + 362         print(best_top[0].hand.type)
+  ~                            + 363         if p.top.type == best_top[0].hand.type:
+  ~                            + 364             for c in  p.top.hand:
+  ~                            + 365                 if c.hand.value.value < best_top[0].hand.value.value:
+  ~                            + 366                     print("lose")
+  ~                            + 367                     win = False
+  ~                            + 368             if win:
+  ~                            + 369                 print("win")
+  ~                            + 370
+  ~                              371 #for testing make community cards
+  ~                              372 test_community_cards = []
+  ~                              373 test_community_cards.append(Card(Number(5),Suit(0)))
+<b.com/gingerben93/pokerserver   NORMAL  +29 ~14 -0   src/pokerRuleLogic.py                                           python  utf-8[unix]   93% 0  362/389 Ñÿ : 36
+"src/pokerRuleLogic.py" 389L, 12395C written
