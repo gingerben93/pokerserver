@@ -133,14 +133,14 @@ def find_player_hand_types(community_cards, player_hand, player_name):
               player_hand.hand[5],
               player_hand.hand[6]]
 
-    top_hand = what_is_hand(top)
-    middle_hand = what_is_hand(middle)
-    bottom_hand1 = what_is_hand(bottom1)
-    bottom_hand2 = what_is_hand(bottom2)
-    bottom_hand3 = what_is_hand(bottom3)
-    bottom_hand4 = what_is_hand(bottom4)
-    bottom_hand5 = what_is_hand(bottom5)
-    bottom_hand6 = what_is_hand(bottom6)
+    top_hand = what_is_hand(top, False)
+    middle_hand = what_is_hand(middle, False)
+    bottom_hand1 = what_is_hand(bottom1, True)
+    bottom_hand2 = what_is_hand(bottom2, True)
+    bottom_hand3 = what_is_hand(bottom3, True)
+    bottom_hand4 = what_is_hand(bottom4, True)
+    bottom_hand5 = what_is_hand(bottom5, True)
+    bottom_hand6 = what_is_hand(bottom6, True)
 
     list_bottom_hands  = []
     list_bottom_hands.append(bottom_hand1)
@@ -245,17 +245,24 @@ def get_unique_list(list_cards_a, list_cards_b):
     return list_cards_b
 
 #returns type of Hand
-def what_is_hand(list_cards):
+def what_is_hand(list_cards, isBottom):
     list_cards = sort_cards(list_cards)
 
     list_flush = find_flush(list_cards)
 
     #check for royal list_flush
     if list_flush != None:
-        list_straight_flush = find_straight(list_flush)
-        if list_straight_flush != None:
-            for i in list_straight_flush:
-                return Hand(list_straight_flush, HandType.StraightFlush)
+        if isBottom and list_cards[-1] in list_flush and list_cards[-2] in list_flush:
+            list_straight_flush = find_straight(list_flush)
+            if list_straight_flush != None:
+                if isBottom and list_cards[-1] in list_straight_flush and list_cards[-2] in list_straight_flush:
+                    for i in list_straight_flush:
+                        return Hand(list_straight_flush, HandType.StraightFlush)
+        else:
+            list_straight_flush = find_straight(list_flush)
+            if list_straight_flush != None:
+                for i in list_straight_flush:
+                    return Hand(list_straight_flush, HandType.StraightFlush)
 
     #check for  four of a kind
     list_dups_4kind = find_duplicates(list_cards, 4)
@@ -330,12 +337,28 @@ def find_best_hand(list_hands):
 
     return list_best_hands
 
+def compare_against_super_player(player_hand, best_hand):
+
+    win = True
+
+    if player_hand.type == best_hand[0].type:
+        for c in range(len(player_hand.hand)):
+            if player_hand.hand[c].value.value < best_hand[0].hand[c].value.value:
+                print("lose")
+                win = False
+                break
+        if win:
+            print("win")
+    else:
+        print("lose")
+
 def find_winning_player(list_players):
     if list_players == None:
         print("something wnet so so wrong")
     list_top_hands = []
     list_middle_hands = []
     list_bottom_hands = []
+
     for p in list_players:
         list_top_hands.append(p.top)
         list_middle_hands.append(p.middle)
@@ -346,33 +369,10 @@ def find_winning_player(list_players):
     best_middle = find_best_hand(list_middle_hands)
     best_bottom = find_best_hand(list_bottom_hands)
 
-    print("BEST")
-    print("------------------------------")
-    for i in best_top[0].hand:
-        print(i.value, i.suit)
-    print("------------------------------")
-    for i in best_middle[0].hand:
-        print(i.value, i.suit)
-    print("------------------------------")
-    for i in best_bottom[0].hand:
-        print(i.value, i.suit)
-
-    #compare players to super player; print if the tie/win or lose against super player
     for p in list_players:
-        print("------------------------------")
-        win = True
-        print(p.name)
-        print(p.top.type)
-        print(best_top[0].type)
-        if p.top.type == best_top[0].type:
-            for c in range(len(p.top.hand)):
-                if p.top.hand[c].value.value < best_top[0].hand[c].value.value:
-                    print("lose")
-                    win = False
-            if win:
-                print("win")
-        else:
-            print("lose")
+        compare_against_super_player(p.top, best_top)
+        compare_against_super_player(p.middle, best_middle)
+        compare_against_super_player(p.bottom, best_bottom)
 
 #for testing make community cards
 test_community_cards = []
@@ -384,12 +384,12 @@ test_community_cards.append(Card(Number(7),Suit(1)))
 
 #make players
 list_players = []
-player_hand1 = make_player_hands([1,2,2,2,2,2,2],[2,2,2,2,2,2,2])
-player_hand2 = make_player_hands([3,3,3,3,3,3,3],[3,3,3,3,3,3,3])
+player_hand1 = make_player_hands([5,2,2,2,2,2,2],[2,2,2,2,2,2,2])
+player_hand2 = make_player_hands([1,3,3,3,3,3,3],[3,3,3,3,3,3,3])
 
 list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1"))
 list_players.append(find_player_hand_types(test_community_cards, player_hand2, "player2"))
 
+#test players
 find_winning_player(list_players)
 
-#test players
