@@ -1,4 +1,6 @@
 from enum import Enum
+import collections
+import itertools
 
 class Suit(Enum):
     Spades = 0
@@ -36,6 +38,9 @@ class Card:
     def __init__(self, value = None, suit = None):
         self.value = value
         self.suit = suit
+
+    def __getitem__(self, value):
+        return value
 
 class Hand:
     def __init__(self, hand = None, type = None):
@@ -135,24 +140,9 @@ def find_player_hand_types(community_cards, player_hand, player_name):
 
     top_hand = what_is_hand(top)
     middle_hand = what_is_hand(middle)
-    bottom_hand1 = find_Omaha_hand(bottom1)
-    bottom_hand2 = find_Omaha_hand(bottom2)
-    bottom_hand3 = find_Omaha_hand(bottom3)
-    bottom_hand4 = find_Omaha_hand(bottom4)
-    bottom_hand5 = find_Omaha_hand(bottom5)
-    bottom_hand6 = find_Omaha_hand(bottom6)
+    bottom_hand = get_bottom_hand(community_cards, player_hand.hand[3:])
 
-    list_bottom_hands  = []
-    list_bottom_hands.append(bottom_hand1)
-    list_bottom_hands.append(bottom_hand2)
-    list_bottom_hands.append(bottom_hand3)
-    list_bottom_hands.append(bottom_hand4)
-    list_bottom_hands.append(bottom_hand5)
-    list_bottom_hands.append(bottom_hand6)
-
-    best_hand_bottom = find_best_hand(list_bottom_hands)
-
-    player_temp = Player(player_name, top_hand, middle_hand, best_hand_bottom)
+    player_temp = Player(player_name, top_hand, middle_hand, bottom_hand)
 
     print(player_name)
     print("------------------------------")
@@ -166,41 +156,20 @@ def find_player_hand_types(community_cards, player_hand, player_name):
         print(i.value, i.suit)
     return player_temp
 
-def find_Omaha_hand(list_cards):
-    hand1 = [list_cards[0], list_cards[1], list_cards[2], list_cards[-1], list_cards[-2]]
-    hand2 = [list_cards[0], list_cards[1], list_cards[3], list_cards[-1], list_cards[-2]]
-    hand3 = [list_cards[0], list_cards[1], list_cards[4], list_cards[-1], list_cards[-2]]
-    hand4 = [list_cards[0], list_cards[2], list_cards[3], list_cards[-1], list_cards[-2]]
-    hand5 = [list_cards[0], list_cards[2], list_cards[4], list_cards[-1], list_cards[-2]]
-    hand6 = [list_cards[0], list_cards[3], list_cards[4], list_cards[-1], list_cards[-2]]
-    hand7 = [list_cards[1], list_cards[2], list_cards[3], list_cards[-1], list_cards[-2]]
-    hand8 = [list_cards[1], list_cards[2], list_cards[4], list_cards[-1], list_cards[-2]]
-    hand9 = [list_cards[1], list_cards[3], list_cards[4], list_cards[-1], list_cards[-2]]
-    hand10 = [list_cards[2], list_cards[3], list_cards[4], list_cards[-1], list_cards[-2]]
+def get_bottom_hand(community_cards, player_bottom_cards):
+    community_card_combination = list(itertools.combinations(community_cards, 3))
+    player_hand_combinations = list(itertools.combinations(player_bottom_cards, 2))
 
-    list_hands = []
+    all_combinations = []
+    for x in community_card_combination:
+        for y in player_hand_combinations:
+            all_combinations.append(x+y)
 
-    list_hands.append(what_is_hand(hand1))
-    list_hands.append(what_is_hand(hand2))
-    list_hands.append(what_is_hand(hand3))
-    list_hands.append(what_is_hand(hand4))
-    list_hands.append(what_is_hand(hand5))
-    list_hands.append(what_is_hand(hand6))
-    list_hands.append(what_is_hand(hand7))
-    list_hands.append(what_is_hand(hand8))
-    list_hands.append(what_is_hand(hand9))
-    list_hands.append(what_is_hand(hand10))
+    all_hands = []
+    for x in all_combinations:
+        all_hands.append(what_is_hand(x))
 
-    for h in list_hands:
-        print("------------------------------")
-        for c in h.hand:
-            print(c.value, c.suit)
-
-    print("find OH hand")
-    list_best_hand = find_best_hand(list_hands)
-
-    return list_best_hand
-
+    return find_best_hand(all_hands)
 
 def find_flush(list_cards):
     list_spades = []
@@ -259,19 +228,23 @@ def find_straight(list_cards):
     return None
 
 #give list and number of dups you want: returns 5 cards
-def find_duplicates(list_cards, num_dup):
-    cur_num_dups = 0
+def find_duplicates(list_cards):
+
+    list_list_dups = []
     list_dups = []
-    for x in list_cards:
-        for y in list_cards:
-            if x.value == y.value:
-                list_dups.append(y)
-                cur_num_dups += 1
-            if cur_num_dups == num_dup:
-                return list_dups
-        list_dups = []
-        cur_num_dups = 0
-    return None
+
+    list_dups.append(list_cards[0])
+
+    for i in range(len(list_cards)-1):
+        if list_cards[i].value.value == list_cards[i + 1].value.value:
+            list_dups.append(list_cards[i + 1])
+        else:
+            list_list_dups.append(list_dups)
+            list_dups = []
+            list_dups.append(list_cards[i+1])
+
+    list_list_dups.append(list_dups)
+    return list_list_dups
 
 def get_unique_list(list_cards_a, list_cards_b):
     for c in list_cards_a:
@@ -281,9 +254,10 @@ def get_unique_list(list_cards_a, list_cards_b):
 
 #returns type of Hand
 def what_is_hand(list_cards):
-    list_cards = sort_cards(list_cards)
+    make_list = list(list_cards)
+    list_sorted_cards = sort_cards(make_list)
 
-    list_flush = find_flush(list_cards)
+    list_flush = find_flush(list_sorted_cards)
 
     #check for royal list_flush
     if list_flush != None:
@@ -292,21 +266,40 @@ def what_is_hand(list_cards):
             for i in list_straight_flush:
                 return Hand(list_straight_flush, HandType.StraightFlush)
 
+    list_list_dups = find_duplicates(list_sorted_cards)
+
     #check for  four of a kind
-    list_dups_4kind = find_duplicates(list_cards, 4)
-    if list_dups_4kind != None:
+    list_dups_4kind = []
+    for l in list_list_dups:
+        if len(l) == 4:
+            list_dups_4kind = l
+            break
+
+    if len(list_dups_4kind) == 4:
         #found 4 kind so add next highest card
-        list_remainer_cards = get_unique_list(list_dups_4kind, list_cards)
+        list_remainer_cards = get_unique_list(list_dups_4kind, list_sorted_cards)
         list_dups_4kind.append(list_remainer_cards[0])
         return Hand(list_dups_4kind, HandType.FourKind)
 
     #check for full house
-    list_dups_3kind = find_duplicates(list_cards, 3)
-    if list_dups_3kind != None:
-        list_remainer_cards = get_unique_list(list_dups_3kind, list_cards)
-        list_dups_2kind = find_duplicates(list_remainer_cards, 2)
-        if list_dups_2kind != None:
-            list_fullhouse = list_dups_3kind + list_dups_2kind
+    list_dups_3kind = []
+    for l in list_list_dups:
+        if len(l) == 3:
+            list_dups_3kind = l
+            break
+
+    if len(list_dups_3kind) == 3:
+        list_remainer_cards = get_unique_list(list_dups_3kind, list_sorted_cards)
+        list_remainer_dups = find_duplicates(list_remainer_cards)
+
+        list_dups_2kind = []
+        for l in list_remainer_dups:
+            if len(l) >= 2:
+                list_dups_2kind = l
+                break
+
+        if len(list_dups_2kind) >= 2:
+            list_fullhouse = list_dups_3kind + list_dups_2kind[:2]
             return Hand(list_fullhouse, HandType.FullHouse)
 
     #check for flush
@@ -314,51 +307,63 @@ def what_is_hand(list_cards):
         return Hand(list_flush[:5], HandType.Flush)
 
     #check for straight
-    list_straight = find_straight(list_cards)
+    list_straight = find_straight(list_sorted_cards)
     if list_straight != None:
         return Hand(list_straight[:5], HandType.Stright)
 
     #check for 3 kind
-    if list_dups_3kind != None:
-        list_remainer_cards = get_unique_list(list_dups_3kind, list_cards)
-        return Hand(list_dups_3kind + list_remainer_cards[:2], HandType.Stright)
+    if len(list_dups_3kind) == 3:
+        list_remainer_cards = get_unique_list(list_dups_3kind, list_sorted_cards)
+        return Hand(list_dups_3kind + list_remainer_cards[:2], HandType.ThreeKind)
 
     #check for two pair
-    list_dups_2kind_1 = find_duplicates(list_cards, 2)
-    if list_dups_2kind_1 != None:
-        list_remainer_cards = get_unique_list(list_dups_2kind_1, list_cards)
-        list_dups_2kind_2 = find_duplicates(list_remainer_cards, 2)
-        if list_dups_2kind_2 != None:
+    list_dups_2kind_1 = []
+    for l in list_list_dups:
+        if len(l) == 2:
+            list_dups_2kind_1 = l
+            break
+
+    if len(list_dups_2kind_1) == 2:
+        list_remainer_cards = get_unique_list(list_dups_2kind_1, list_sorted_cards)
+        list_remainer_dups = find_duplicates(list_remainer_cards)
+        list_dups_2kind_2 = []
+
+        for l in list_remainer_dups:
+            if len(l) == 2:
+                list_dups_2kind_2 = l
+                break
+
+        if len(list_dups_2kind_2) == 2:
             list_remainer_cards_2 = get_unique_list(list_dups_2kind_2, list_remainer_cards)
             list_2pair = list_dups_2kind_1 + list_dups_2kind_2 + list_remainer_cards_2[:1]
             return Hand(list_2pair, HandType.TwoPair)
 
     #check for pair
-    if list_dups_2kind_1 != None:
-        list_remainer_cards = get_unique_list(list_dups_2kind_1, list_cards)
+
+    if len(list_dups_2kind_1) == 2:
+        list_remainer_cards = get_unique_list(list_dups_2kind_1, list_sorted_cards)
         return Hand(list_dups_2kind_1 + list_remainer_cards[:3], HandType.Pair)
 
     #check for high card
-    return Hand(list_cards[:5], HandType.HighCard)
+    return Hand(list_sorted_cards[:5], HandType.HighCard)
 
 #takes list hands returns best hand
 def find_best_hand(list_hands):
     best_hand = Hand(list_hands[0].hand, list_hands[0].type)
     for h in range(len(list_hands)):
-        if best_hand == None:
-            best_hand = [list_hands[h]]
-        elif best_hand.type.value < list_hands[h].type.value:
+        if best_hand.type.value < list_hands[h].type.value:
             best_hand = list_hands[h]
         elif best_hand.type.value == list_hands[h].type.value:
             for i in range(len(best_hand.hand)):
                 if best_hand.hand[i].value.value < list_hands[h].hand[i].value.value:
                     best_hand = list_hands[h]
+                    break
+                if best_hand.hand[i].value.value > list_hands[h].hand[i].value.value:
+                    break
 
-    print(best_hand.type)
     return best_hand
 
 def compare_against_super_player(player_hand, best_hand):
-
     win = True
 
     if player_hand.type == best_hand.type:
@@ -405,7 +410,7 @@ test_community_cards.append(Card(Number(5),Suit(1)))
 #make players
 list_players = []
 player_hand1 = make_player_hands([5,2,2,7,6,2,2],[2,2,2,2,2,2,2])
-player_hand2 = make_player_hands([1,3,3,7,5,3,3],[3,3,3,3,3,3,3])
+player_hand2 = make_player_hands([5,2,2,7,5,2,2],[2,2,2,2,2,2,2])
 
 list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1"))
 list_players.append(find_player_hand_types(test_community_cards, player_hand2, "player2"))
