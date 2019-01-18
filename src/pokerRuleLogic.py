@@ -9,19 +9,19 @@ class Suit(Enum):
     Diamonds = 3
 
 class Number(Enum):
-    Two = 0
-    Three = 1
-    Four = 2
-    Five = 3
-    Six = 4
-    Seven = 5
-    Eight = 6
-    Nine = 7
-    Ten = 8
-    Jack = 9
-    Queen = 10
-    King = 11
-    Ace = 12
+    Two = 2
+    Three = 3
+    Four = 4
+    Five = 5
+    Six = 6
+    Seven = 7
+    Eight = 8
+    Nine = 9
+    Ten = 10
+    Jack = 11
+    Queen = 12
+    King = 13
+    Ace = 14
 
 class HandType(Enum):
     StraightFlush = 8
@@ -146,12 +146,15 @@ def find_player_hand_types(community_cards, player_hand, player_name):
 
     print(player_name)
     print("------------------------------")
+    print(player_temp.top.type)
     for i in player_temp.top.hand:
         print(i.value, i.suit)
     print("------------------------------")
+    print(player_temp.middle.type)
     for i in player_temp.middle.hand:
         print(i.value, i.suit)
     print("------------------------------")
+    print(player_temp.bottom.type)
     for i in player_temp.bottom.hand:
         print(i.value, i.suit)
     return player_temp
@@ -215,7 +218,7 @@ def find_straight(list_cards):
         elif list_cards[i].value.value == list_cards[(i+1) % len(list_cards)].value.value:
             continue
         #if last card is two and first card is ace
-        elif list_cards[i].value.value == 0 and list_cards[0].value.value == 12:
+        elif list_cards[i].value.value == 2 and list_cards[0].value.value == 14:
             list_straight.append(list_cards[0])
         #clear straight if next value not == or 1 less
         else:
@@ -363,6 +366,7 @@ def find_best_hand(list_hands):
 
     return best_hand
 
+#compares player against super to check if player wins
 def compare_against_super_player(player_hand, best_hand):
     win = True
 
@@ -400,20 +404,25 @@ def find_winning_player(list_players):
         compare_against_super_player(p.bottom, best_bottom)
 
 #for testing make community cards
-test_community_cards = []
-test_community_cards.append(Card(Number(7),Suit(0)))
-test_community_cards.append(Card(Number(7),Suit(1)))
-test_community_cards.append(Card(Number(6),Suit(2)))
-test_community_cards.append(Card(Number(6),Suit(1)))
-test_community_cards.append(Card(Number(5),Suit(1)))
+def make_community_cards():
+    test_community_cards = []
+    test_community_cards.append(Card(Number(7),Suit(0)))
+    test_community_cards.append(Card(Number(7),Suit(1)))
+    test_community_cards.append(Card(Number(6),Suit(2)))
+    test_community_cards.append(Card(Number(6),Suit(1)))
+    test_community_cards.append(Card(Number(5),Suit(1)))
+
+    return test_community_cards
+
+community_cards = make_community_cards()
 
 #make players
 list_players = []
-player_hand1 = make_player_hands([5,2,2,7,6,2,2],[2,2,2,2,2,2,2])
-player_hand2 = make_player_hands([5,2,2,7,5,2,2],[2,2,2,2,2,2,2])
+player_hand1 = make_player_hands([10,7,2,2,2,12,2],[3,1,1,3,2,1,3])
+player_hand2 = make_player_hands([10,7,2,4,9,12,2],[3,1,1,3,2,1,3])
 
-list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1"))
-list_players.append(find_player_hand_types(test_community_cards, player_hand2, "player2"))
+list_players.append(find_player_hand_types(community_cards, player_hand1, "player1"))
+list_players.append(find_player_hand_types(community_cards, player_hand2, "player1"))
 
 #test players
 find_winning_player(list_players)
