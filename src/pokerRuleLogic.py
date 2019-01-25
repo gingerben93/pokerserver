@@ -1,4 +1,5 @@
 from enum import Enum
+import random
 import collections
 import itertools
 
@@ -64,6 +65,39 @@ def sort_cards(list_cards):
                 list_cards[j + 1] = temp
     return list_cards
 
+#make 52 card deck
+def make_deck():
+    deck = []
+    for x in range(0,4):
+        for y in range(2,14):
+            deck.append(Card(Number(y),Suit(x)))
+    return deck
+
+#random 5 community cards
+def make_community_cards(deck):
+    community_cards = []
+
+    for x in range(0,5):
+        current_card = deck[random.randint(0,len(deck)-1)]
+        community_cards.append(current_card)
+        deck.remove(current_card)
+
+    return community_cards
+
+#makes 7 random cards from deck and return them in hand class
+def make_player_hand(deck):
+    player_cards = []
+
+    for x in range(0,7):
+        current_card = deck[random.randint(0,len(deck)-1)]
+        player_cards.append(current_card)
+        deck.remove(current_card)
+
+    player_hand = Hand(player_cards, None)
+
+    return player_hand
+
+#used for testing certain hands; might be used to load in number from data base
 #takes two list of ints; should be 7 ints; indexes should match up; return hand
 def make_player_hands(list_number, list_suit):
     #make player hand
@@ -403,26 +437,24 @@ def find_winning_player(list_players):
         compare_against_super_player(p.middle, best_middle)
         compare_against_super_player(p.bottom, best_bottom)
 
-#for testing make community cards
-def make_community_cards():
-    test_community_cards = []
-    test_community_cards.append(Card(Number(7),Suit(0)))
-    test_community_cards.append(Card(Number(7),Suit(1)))
-    test_community_cards.append(Card(Number(6),Suit(2)))
-    test_community_cards.append(Card(Number(6),Suit(1)))
-    test_community_cards.append(Card(Number(5),Suit(1)))
+deck = make_deck()
+community_cards = make_community_cards(deck)
 
-    return test_community_cards
-
-community_cards = make_community_cards()
+print("------------------------------")
+for i in community_cards:
+    print(i.value, i.suit)
+print("------------------------------")
 
 #make players
 list_players = []
-player_hand1 = make_player_hands([10,7,2,2,2,12,2],[3,1,1,3,2,1,3])
-player_hand2 = make_player_hands([10,7,2,4,9,12,2],[3,1,1,3,2,1,3])
+
+player_hand1 = make_player_hand(deck)
+print("------------------------------")
+for i in player_hand1.hand:
+    print(i.value, i.suit)
+print("------------------------------")
 
 list_players.append(find_player_hand_types(community_cards, player_hand1, "player1"))
-list_players.append(find_player_hand_types(community_cards, player_hand2, "player1"))
 
 #test players
 find_winning_player(list_players)
