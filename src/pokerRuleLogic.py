@@ -437,25 +437,25 @@ def find_winning_player(list_players):
         compare_against_super_player(p.middle, best_middle)
         compare_against_super_player(p.bottom, best_bottom)
 
-deck = make_deck()
-community_cards = make_community_cards(deck)
-
-print("------------------------------")
-for i in community_cards:
-    print(i.value, i.suit)
-print("------------------------------")
-
-#make players
-list_players = []
-
-player_hand1 = make_player_hand(deck)
-print("------------------------------")
-for i in player_hand1.hand:
-    print(i.value, i.suit)
-print("------------------------------")
-
-list_players.append(find_player_hand_types(community_cards, player_hand1, "player1"))
-
-#test players
-find_winning_player(list_players)
+#deck = make_deck()
+#community_cards = make_community_cards(deck)
+#
+#print("------------------------------")
+#for i in community_cards:
+#    print(i.value, i.suit)
+#print("------------------------------")
+#
+##make players
+#list_players = []
+#
+#player_hand1 = make_player_hand(deck)
+#print("------------------------------")
+#for i in player_hand1.hand:
+#    print(i.value, i.suit)
+#print("------------------------------")
+#
+#list_players.append(find_player_hand_types(community_cards, player_hand1, "player1"))
+#
+##test players
+#find_winning_player(list_players)
 
