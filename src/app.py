@@ -4,6 +4,7 @@ import logging
 #import pokerRuleLogic
 from pokerRuleLogic import make_deck
 from pokerRuleLogic import make_player_hand
+from pokerRuleLogic import make_player_hands
 from pokerRuleLogic import find_player_hand_types
 from pokerRuleLogic import find_winning_player
 from pokerRuleLogic import make_community_cards
@@ -22,6 +23,7 @@ def index_get():
 @app.route("/get_free_cards", methods=['GET'])
 def get_free_cards():
     if(request.method == 'GET'):
+        global deck
         deck = make_deck()
         player_hand = make_player_hand(deck)
         cards_value = []
@@ -34,6 +36,43 @@ def get_free_cards():
         json_value = json.dumps(cards_value)
         json_suit = json.dumps(cards_suit)
         return jsonify({'values': json_value}, {'suits': json_suit})
+
+
+@app.route("/lock_in_cards", methods=['POST'])
+def lock_in_cards():
+    if(request.method == 'POST'):
+        list_values = []
+        list_suits = []
+        client_message = request.get_json()
+
+        for row in client_message:
+            row_json = client_message[row]
+            print(row_json)
+            for card in row_json:
+                list_values.append((int)(client_message[row][card]['value']))
+                list_suits.append((int)(client_message[row][card]['suit']))
+
+        list_players = []
+        global deck
+        test_community_cards = make_community_cards(deck)
+        player_hand1 = make_player_hands(list_values, list_suits)
+
+        list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1"))
+
+        find_winning_player(list_players)
+
+        cards_value = []
+        cards_suit = []
+
+        for c in test_community_cards:
+            cards_value.append(c.value.value)
+            cards_suit.append(c.suit.value)
+
+        json_value = json.dumps(cards_value)
+        json_suit = json.dumps(cards_suit)
+
+        return jsonify({'values': json_value}, {'suits': json_suit})
+        return jsonify({'post message': client_message})
 
 @app.route("/", methods=['POST'])
 def index_post():
