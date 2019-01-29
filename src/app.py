@@ -65,6 +65,10 @@ def lock_in_cards():
         bottom_cards = []
         temp_wrapper = find_winning_player(list_players)
 
+        top_type = []
+        middle_type = []
+        bottom_type =[]
+
         win_lose.append(temp_wrapper[0])
         top_cards.append(temp_wrapper[1])
         middle_cards.append(temp_wrapper[2])
@@ -78,6 +82,7 @@ def lock_in_cards():
         top_suit = []
         for player in top_cards:
             for hand in player:
+                top_type.append(hand.type.name)
                 for c in hand.hand:
                     top_value.append(c.value.value)
                     top_suit.append(c.suit.value)
@@ -86,6 +91,7 @@ def lock_in_cards():
         middle_suit = []
         for player in middle_cards:
             for hand in player:
+                middle_type.append(hand.type.name)
                 for c in hand.hand:
                     middle_value.append(c.value.value)
                     middle_suit.append(c.suit.value)
@@ -94,6 +100,7 @@ def lock_in_cards():
         bottom_suit = []
         for player in bottom_cards:
             for hand in player:
+                bottom_type.append(hand.type.name)
                 for c in hand.hand:
                     bottom_value.append(c.value.value)
                     bottom_suit.append(c.suit.value)
@@ -110,20 +117,26 @@ def lock_in_cards():
         json_win_lose = json.dumps(win_lose)
         json_top_cards_value = json.dumps(top_value)
         json_top_cards_suit = json.dumps(top_suit)
+        json_top_type = json.dumps(top_type)
         json_middle_cards_value = json.dumps(middle_value)
         json_middle_cards_suit = json.dumps(middle_suit)
+        json_middle_type = json.dumps(middle_type)
         json_bottom_cards_value = json.dumps(bottom_value)
         json_bottom_cards_suit = json.dumps(bottom_suit)
+        json_bottom_type = json.dumps(bottom_type)
 
         return jsonify({'values': json_value},
                         {'suits': json_suit},
                         {'win_lose': json_win_lose},
                         {'top_value': json_top_cards_value},
                         {'top_suit': json_top_cards_suit},
+                        {'top_type': json_top_type},
                         {'middle_value': json_middle_cards_value},
                         {'middle_suit': json_middle_cards_suit},
+                        {'middle_type': json_middle_type},
                         {'bottom_value': json_bottom_cards_value},
-                        {'bottom_suit': json_bottom_cards_suit})
+                        {'bottom_suit': json_bottom_cards_suit},
+                        {'bottom_type': json_bottom_type})
 
 @app.route("/", methods=['POST'])
 def index_post():
