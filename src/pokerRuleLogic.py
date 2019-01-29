@@ -409,15 +409,19 @@ def compare_against_super_player(player_hand, best_hand):
             if player_hand.hand[c].value.value < best_hand.hand[c].value.value:
                 print("lose")
                 win = False
+                return "win"
                 break
         if win:
             print("win")
+            return "win"
     else:
         print("lose")
+        return "win"
 
 def find_winning_player(list_players):
     if list_players == None:
         print("something wnet so so wrong")
+
     list_top_hands = []
     list_middle_hands = []
     list_bottom_hands = []
@@ -432,10 +436,19 @@ def find_winning_player(list_players):
     best_middle = find_best_hand(list_middle_hands)
     best_bottom = find_best_hand(list_bottom_hands)
 
+    list_player_win_lose = []
     for p in list_players:
-        compare_against_super_player(p.top, best_top)
-        compare_against_super_player(p.middle, best_middle)
-        compare_against_super_player(p.bottom, best_bottom)
+        temp_win_lose = []
+        temp_win_lose.append(compare_against_super_player(p.top, best_top))
+        temp_win_lose.append(compare_against_super_player(p.middle, best_middle))
+        temp_win_lose.append(compare_against_super_player(p.bottom, best_bottom))
+
+    temp_wrapper = []
+    temp_wrapper.append(temp_win_lose)
+    temp_wrapper.append(list_top_hands)
+    temp_wrapper.append(list_middle_hands)
+    temp_wrapper.append(list_bottom_hands)
+    return temp_wrapper
 
 #deck = make_deck()
 #community_cards = make_community_cards(deck)
