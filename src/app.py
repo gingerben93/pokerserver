@@ -15,6 +15,29 @@ app = Flask(__name__)
 
 deck = []
 
+def player_data():
+    def __init__(self,
+                 player_name,
+                 community_card_values,
+                 community_card_suits,
+                 top_cards_values,
+                 top_cards_suits,
+                 middle_cards_values,
+                 middle_cards_suit,
+                 bottom_cards_values,
+                 bottom_cards_suits,
+                 list_win_lost):
+        self.player_name = player_name
+        self.community_card_values = community_card_values
+        self.community_card_suit = community_card_suits
+        self.top_cards_values = top_cards_values
+        self.top_cards_suits = top_cards_suits
+        self.middle_cards_values = middle_cards_values
+        self.middle_cards_suit = middle_cards_suit
+        self.bottom_cards_values = bottom_cards_values
+        self.bottom_cards_suit = bottom_cards_suits
+        self.list_win_lost = list_win_lost
+
 @app.route("/", methods=['GET'])
 def index_get():
     if(request.method == 'GET'):
@@ -55,9 +78,18 @@ def lock_in_cards():
         list_players = []
         global deck
         test_community_cards = make_community_cards(deck)
+        #make second player for testing
+        player2 = make_player_hand(deck)
+        list_values_p2 = []
+        list_suits_p2 = []
+        for x in player2.hand:
+            list_values_p2.append(x.value.value)
+            list_suits_p2.append(x.suit.value)
+        player_hand2 = make_player_hands(list_values_p2, list_suits_p2)
         player_hand1 = make_player_hands(list_values, list_suits)
 
         list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1"))
+        list_players.append(find_player_hand_types(test_community_cards, player_hand2, "player2"))
 
         win_lose = []
         top_cards = []
@@ -74,9 +106,9 @@ def lock_in_cards():
         middle_cards.append(temp_wrapper[2])
         bottom_cards.append(temp_wrapper[3])
 
-        for p in win_lose:
-            for x in p:
-                print(x)
+        for player in list_players:
+            jsonStringPlayers = jsonStringPlayers + player.name
+
 
         top_value = []
         top_suit = []

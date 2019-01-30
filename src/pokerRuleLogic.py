@@ -409,14 +409,14 @@ def compare_against_super_player(player_hand, best_hand):
             if player_hand.hand[c].value.value < best_hand.hand[c].value.value:
                 print("lose")
                 win = False
-                return "win"
+                return "lose"
                 break
         if win:
             print("win")
             return "win"
     else:
         print("lose")
-        return "win"
+        return "lose"
 
 def find_winning_player(list_players):
     if list_players == None:
@@ -442,9 +442,10 @@ def find_winning_player(list_players):
         temp_win_lose.append(compare_against_super_player(p.top, best_top))
         temp_win_lose.append(compare_against_super_player(p.middle, best_middle))
         temp_win_lose.append(compare_against_super_player(p.bottom, best_bottom))
+        list_player_win_lose.append(temp_win_lose)
 
     temp_wrapper = []
-    temp_wrapper.append(temp_win_lose)
+    temp_wrapper.append(list_player_win_lose)
     temp_wrapper.append(list_top_hands)
     temp_wrapper.append(list_middle_hands)
     temp_wrapper.append(list_bottom_hands)
