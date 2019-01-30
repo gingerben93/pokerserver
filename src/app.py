@@ -81,10 +81,11 @@ def lock_in_cards():
             cards_value.append(c.value.value)
             cards_suit.append(c.suit.value)
 
+        list_dict_player_data = []
+
         list_dict_player_data.append(cards_value)
         list_dict_player_data.append(cards_suit)
 
-        list_dict_player_data = []
         for player_data in list_player_data:
             list_dict_player_data.append(player_data.__dict__)
 
