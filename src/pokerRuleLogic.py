@@ -55,6 +55,24 @@ class Player:
         self.middle = middle
         self.bottom = bottom
 
+class Player_data():
+    def __init__(self, player_name = None,
+                 top_cards_values = None,
+                 top_cards_suits = None,
+                 middle_cards_values = None,
+                 middle_cards_suits = None,
+                 bottom_cards_values = None,
+                 bottom_cards_suits = None,
+                 list_win_lost = None):
+        self.player_name = player_name
+        self.top_cards_values = top_cards_values
+        self.top_cards_suits = top_cards_suits
+        self.middle_cards_values = middle_cards_values
+        self.middle_cards_suits = middle_cards_suits
+        self.bottom_cards_values = bottom_cards_values
+        self.bottom_cards_suit = bottom_cards_suits
+        self.list_win_lost = list_win_lost
+
 #using bubble sort temporaly
 def sort_cards(list_cards):
     for i in range(len(list_cards)-1):
@@ -409,14 +427,17 @@ def compare_against_super_player(player_hand, best_hand):
             if player_hand.hand[c].value.value < best_hand.hand[c].value.value:
                 print("lose")
                 win = False
-                return "lose"
+                lose1 = "lose"
+                return lose1
                 break
         if win:
             print("win")
-            return "win"
+            win1 = "win"
+            return win1
     else:
         print("lose")
-        return "lose"
+        lose2 = "lose"
+        return lose2
 
 def find_winning_player(list_players):
     if list_players == None:
@@ -444,12 +465,36 @@ def find_winning_player(list_players):
         temp_win_lose.append(compare_against_super_player(p.bottom, best_bottom))
         list_player_win_lose.append(temp_win_lose)
 
-    temp_wrapper = []
-    temp_wrapper.append(list_player_win_lose)
-    temp_wrapper.append(list_top_hands)
-    temp_wrapper.append(list_middle_hands)
-    temp_wrapper.append(list_bottom_hands)
-    return temp_wrapper
+    #make player data object for returning to client
+    list_player_data = []
+    for i in range(0, len(list_players)):
+        #set community cards on return from method
+        top_value = []
+        top_suit = []
+        middle_value = []
+        middle_suit = []
+        bottom_value = []
+        bottom_suit = []
+        win_lose = []
+        for x in range(0, len(list_players[i].top.hand)):
+            top_value.append(list_players[i].top.hand[x].value.value)
+            top_suit.append(list_players[i].top.hand[x].suit.value)
+            middle_value.append(list_players[i].middle.hand[x].value.value)
+            middle_suit.append(list_players[i].middle.hand[x].suit.value)
+            bottom_value.append(list_players[i].bottom.hand[x].value.value)
+            bottom_suit.append(list_players[i].bottom.hand[x].suit.value)
+
+        new_player = Player_data(list_players[i].name,
+                    top_value,
+                    top_suit,
+                    middle_value,
+                    middle_suit,
+                    bottom_value,
+                    bottom_suit,
+                    list_player_win_lose[i])
+
+        list_player_data.append(new_player)
+    return list_player_data
 
 #deck = make_deck()
 #community_cards = make_community_cards(deck)
