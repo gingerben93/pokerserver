@@ -49,28 +49,46 @@ class Hand:
         self.type = type
 
 class Player:
-    def __init__(self, name = None, top = None, middle = None, bottom = None):
+    def __init__(self, name = None,
+                 top = None,
+                 middle = None,
+                 bottom = None,
+                 values = None,
+                 suits = None):
         self.name = name
         self.top = top
         self.middle = middle
         self.bottom = bottom
+        self.values = values
+        self.suits = suits
 
 class Player_data():
     def __init__(self, player_name = None,
+                 player_card_values = None,
+                 player_card_suits = None,
                  top_cards_values = None,
                  top_cards_suits = None,
+                 top_cards_type = None,
                  middle_cards_values = None,
                  middle_cards_suits = None,
+                 middle_cards_type = None,
                  bottom_cards_values = None,
                  bottom_cards_suits = None,
+                 bottom_cards_type = None,
                  list_win_lost = None):
         self.player_name = player_name
+        self.player_card_values = player_card_values
+        self.player_card_suits = player_card_suits
+        self.top_cards_values = top_cards_values
         self.top_cards_values = top_cards_values
         self.top_cards_suits = top_cards_suits
+        self.top_cards_type = top_cards_type
         self.middle_cards_values = middle_cards_values
         self.middle_cards_suits = middle_cards_suits
+        self.middle_cards_type = middle_cards_type
         self.bottom_cards_values = bottom_cards_values
         self.bottom_cards_suit = bottom_cards_suits
+        self.bottom_cards_type = bottom_cards_type
         self.list_win_lost = list_win_lost
 
 #using bubble sort temporaly
@@ -126,7 +144,7 @@ def make_player_hands(list_number, list_suit):
     return player_hand
 
 #takes two list of cards
-def find_player_hand_types(community_cards, player_hand, player_name):
+def find_player_hand_types(community_cards, player_hand, player_name, lv, ls):
     top = [community_cards[0],
            community_cards[1],
            community_cards[2],
@@ -142,59 +160,11 @@ def find_player_hand_types(community_cards, player_hand, player_name):
               player_hand.hand[1],
               player_hand.hand[2]]
 
-    bottom1 = [community_cards[0],
-              community_cards[1],
-              community_cards[2],
-              community_cards[3],
-              community_cards[4],
-              player_hand.hand[3],
-              player_hand.hand[4]]
-
-    bottom2 = [community_cards[0],
-              community_cards[1],
-              community_cards[2],
-              community_cards[3],
-              community_cards[4],
-              player_hand.hand[3],
-              player_hand.hand[5]]
-
-    bottom3 = [community_cards[0],
-              community_cards[1],
-              community_cards[2],
-              community_cards[3],
-              community_cards[4],
-              player_hand.hand[3],
-              player_hand.hand[6]]
-
-    bottom4 = [community_cards[0],
-              community_cards[1],
-              community_cards[2],
-              community_cards[3],
-              community_cards[4],
-              player_hand.hand[4],
-              player_hand.hand[5]]
-
-    bottom5 = [community_cards[0],
-              community_cards[1],
-              community_cards[2],
-              community_cards[3],
-              community_cards[4],
-              player_hand.hand[4],
-              player_hand.hand[6]]
-
-    bottom6 = [community_cards[0],
-              community_cards[1],
-              community_cards[2],
-              community_cards[3],
-              community_cards[4],
-              player_hand.hand[5],
-              player_hand.hand[6]]
-
     top_hand = what_is_hand(top)
     middle_hand = what_is_hand(middle)
     bottom_hand = get_bottom_hand(community_cards, player_hand.hand[3:])
 
-    player_temp = Player(player_name, top_hand, middle_hand, bottom_hand)
+    player_temp = Player(player_name, top_hand, middle_hand, bottom_hand, lv, ls)
 
     print(player_name)
     print("------------------------------")
@@ -485,12 +455,17 @@ def find_winning_player(list_players):
             bottom_suit.append(list_players[i].bottom.hand[x].suit.value)
 
         new_player = Player_data(list_players[i].name,
+                    list_players[i].values,
+                    list_players[i].suits,
                     top_value,
                     top_suit,
+                    list_players[i].top.type.name,
                     middle_value,
                     middle_suit,
+                    list_players[i].middle.type.name,
                     bottom_value,
                     bottom_suit,
+                    list_players[i].bottom.type.name,
                     list_player_win_lose[i])
 
         list_player_data.append(new_player)

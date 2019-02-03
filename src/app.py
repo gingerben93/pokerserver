@@ -12,6 +12,11 @@ from pokerRuleLogic import find_player_hand_types
 from pokerRuleLogic import find_winning_player
 from pokerRuleLogic import make_community_cards
 
+class community_cards:
+    def __init__(self, community_card_values = None, commuity_card_suits = None):
+        self.community_card_values = community_card_values
+        self.commuity_card_suits = commuity_card_suits
+
 log = logging.getLogger(__name__)
 
 app = Flask(__name__)
@@ -59,6 +64,7 @@ def lock_in_cards():
         list_players = []
         global deck
         test_community_cards = make_community_cards(deck)
+
         #make second player for testing
         player2 = make_player_hand(deck)
         list_values_p2 = []
@@ -67,10 +73,12 @@ def lock_in_cards():
             list_values_p2.append(x.value.value)
             list_suits_p2.append(x.suit.value)
         player_hand2 = make_player_hands(list_values_p2, list_suits_p2)
+
         player_hand1 = make_player_hands(list_values, list_suits)
 
-        list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1"))
-        list_players.append(find_player_hand_types(test_community_cards, player_hand2, "player2"))
+        #have to add players to list
+        list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1", list_values, list_suits))
+        list_players.append(find_player_hand_types(test_community_cards, player_hand2, "player2", list_values_p2, list_suits_p2))
 
         list_player_data = find_winning_player(list_players)
 
@@ -83,8 +91,9 @@ def lock_in_cards():
 
         list_dict_player_data = []
 
-        list_dict_player_data.append(cards_value)
-        list_dict_player_data.append(cards_suit)
+        current_comminty_cards = community_cards(cards_value, cards_suit)
+
+        list_dict_player_data.append(current_comminty_cards.__dict__)
 
         for player_data in list_player_data:
             list_dict_player_data.append(player_data.__dict__)
