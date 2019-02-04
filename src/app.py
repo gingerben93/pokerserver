@@ -65,7 +65,15 @@ def lock_in_cards():
         global deck
         test_community_cards = make_community_cards(deck)
 
-        for i in range(1,3):
+        #add current player
+        player_hand1 = make_player_hands(list_values, list_suits)
+
+        #have to add players to list
+        list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1", list_values, list_suits))
+
+
+        #start at two because nuner is used to name player; change later when play name comes from player
+        for i in range(2,4):
             temp_player = make_player_hand(deck)
             temp_values = []
             temp_suits = []
@@ -77,12 +85,6 @@ def lock_in_cards():
 
             #have to add players to list
             list_players.append(find_player_hand_types(test_community_cards, temp_player_hand, "player" + str(i), temp_values, temp_suits))
-
-        #add current player
-        player_hand1 = make_player_hands(list_values, list_suits)
-
-        #have to add players to list
-        list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1", list_values, list_suits))
 
         list_player_data = find_winning_player(list_players)
 
