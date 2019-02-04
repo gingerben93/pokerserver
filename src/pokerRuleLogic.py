@@ -68,13 +68,11 @@ class Player_data():
                  player_card_suits = None,
                  top_cards_values = None,
                  top_cards_suits = None,
-                 top_cards_type = None,
                  middle_cards_values = None,
                  middle_cards_suits = None,
-                 middle_cards_type = None,
                  bottom_cards_values = None,
                  bottom_cards_suits = None,
-                 bottom_cards_type = None,
+                 hand_types  = None,
                  list_win_lost = None):
         self.player_name = player_name
         self.player_card_values = player_card_values
@@ -82,13 +80,11 @@ class Player_data():
         self.top_cards_values = top_cards_values
         self.top_cards_values = top_cards_values
         self.top_cards_suits = top_cards_suits
-        self.top_cards_type = top_cards_type
         self.middle_cards_values = middle_cards_values
         self.middle_cards_suits = middle_cards_suits
-        self.middle_cards_type = middle_cards_type
         self.bottom_cards_values = bottom_cards_values
         self.bottom_cards_suit = bottom_cards_suits
-        self.bottom_cards_type = bottom_cards_type
+        self.hand_types = hand_types
         self.list_win_lost = list_win_lost
 
 #using bubble sort temporaly
@@ -454,21 +450,25 @@ def find_winning_player(list_players):
             bottom_value.append(list_players[i].bottom.hand[x].value.value)
             bottom_suit.append(list_players[i].bottom.hand[x].suit.value)
 
+        list_types = []
+        list_types.append(list_players[i].top.type.name)
+        list_types.append(list_players[i].middle.type.name)
+        list_types.append(list_players[i].bottom.type.name)
+
         new_player = Player_data(list_players[i].name,
                     list_players[i].values,
                     list_players[i].suits,
                     top_value,
                     top_suit,
-                    list_players[i].top.type.name,
                     middle_value,
                     middle_suit,
-                    list_players[i].middle.type.name,
                     bottom_value,
                     bottom_suit,
-                    list_players[i].bottom.type.name,
+                    list_types,
                     list_player_win_lose[i])
 
         list_player_data.append(new_player)
+
     return list_player_data
 
 #deck = make_deck()

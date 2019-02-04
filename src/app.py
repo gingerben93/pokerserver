@@ -65,20 +65,24 @@ def lock_in_cards():
         global deck
         test_community_cards = make_community_cards(deck)
 
-        #make second player for testing
-        player2 = make_player_hand(deck)
-        list_values_p2 = []
-        list_suits_p2 = []
-        for x in player2.hand:
-            list_values_p2.append(x.value.value)
-            list_suits_p2.append(x.suit.value)
-        player_hand2 = make_player_hands(list_values_p2, list_suits_p2)
+        for i in range(1,3):
+            temp_player = make_player_hand(deck)
+            temp_values = []
+            temp_suits = []
+            for x in temp_player.hand:
+                temp_values.append(x.value.value)
+                temp_suits.append(x.suit.value)
 
+            temp_player_hand = make_player_hands(temp_values, temp_suits)
+
+            #have to add players to list
+            list_players.append(find_player_hand_types(test_community_cards, temp_player_hand, "player" + str(i), temp_values, temp_suits))
+
+        #add current player
         player_hand1 = make_player_hands(list_values, list_suits)
 
         #have to add players to list
         list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1", list_values, list_suits))
-        list_players.append(find_player_hand_types(test_community_cards, player_hand2, "player2", list_values_p2, list_suits_p2))
 
         list_player_data = find_winning_player(list_players)
 
@@ -89,14 +93,17 @@ def lock_in_cards():
             cards_value.append(c.value.value)
             cards_suit.append(c.suit.value)
 
-        list_dict_player_data = []
+        list_dict_player_data = {}
+        list_data = []
 
         current_comminty_cards = community_cards(cards_value, cards_suit)
 
-        list_dict_player_data.append(current_comminty_cards.__dict__)
+        list_dict_player_data["communityCards"] = current_comminty_cards.__dict__
 
         for player_data in list_player_data:
-            list_dict_player_data.append(player_data.__dict__)
+            list_data.append(player_data.__dict__)
+
+        list_dict_player_data["playerData"] = list_data
 
         json_string = json.dumps(list_dict_player_data)
         return json_string
