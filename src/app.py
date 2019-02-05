@@ -13,16 +13,15 @@ from pokerRuleLogic import find_winning_player
 from pokerRuleLogic import make_community_cards
 
 class community_cards:
-    def __init__(self, community_card_values = None, commuity_card_suits = None):
-        self.community_card_values = community_card_values
-        self.commuity_card_suits = commuity_card_suits
+    def __init__(self, json_dict):
+        self.card_values = json_dict['card_values']
+        self.card_suits = json_dict['card_suits']
 
 log = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
 deck = []
-
 
 @app.route("/", methods=['GET'])
 def index_get():
@@ -42,10 +41,15 @@ def get_free_cards():
             cards_value.append(c.value.value)
             cards_suit.append(c.suit.value)
 
-        json_value = json.dumps(cards_value)
-        json_suit = json.dumps(cards_suit)
-        return jsonify({'values': json_value}, {'suits': json_suit})
+        cards_dict = {}
+        cards_dict['card_values'] = cards_value
+        cards_dict['card_suits'] = cards_suit
 
+        player_free_cards = community_cards(cards_dict)
+
+        json_string_free_cards = json.dumps(player_free_cards.__dict__)
+
+        return json_string_free_cards
 
 @app.route("/lock_in_cards", methods=['POST'])
 def lock_in_cards():
@@ -54,23 +58,17 @@ def lock_in_cards():
         list_suits = []
         client_message = request.get_json()
 
-        for row in client_message:
-            row_json = client_message[row]
-            print(row_json)
-            for card in row_json:
-                list_values.append((int)(client_message[row][card]['value']))
-                list_suits.append((int)(client_message[row][card]['suit']))
+        player_cards = community_cards(client_message)
 
         list_players = []
         global deck
         test_community_cards = make_community_cards(deck)
 
         #add current player
-        player_hand1 = make_player_hands(list_values, list_suits)
+        player_hand1 = make_player_hands(player_cards.card_values, player_cards.card_suits)
 
         #have to add players to list
-        list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1", list_values, list_suits))
-
+        list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1", player_cards.card_values, player_cards.card_suits))
 
         #start at two because nuner is used to name player; change later when play name comes from player
         for i in range(2,4):
@@ -98,7 +96,11 @@ def lock_in_cards():
         list_dict_player_data = {}
         list_data = []
 
-        current_comminty_cards = community_cards(cards_value, cards_suit)
+        cards_dict = {}
+        cards_dict['card_values'] = cards_value
+        cards_dict['card_suits'] = cards_suit
+
+        current_comminty_cards = community_cards(cards_dict)
 
         list_dict_player_data["communityCards"] = current_comminty_cards.__dict__
 
@@ -113,25 +115,7 @@ def lock_in_cards():
 @app.route("/", methods=['POST'])
 def index_post():
     if(request.method == 'POST'):
-        #list_values = []
-        #list_suits = []
         client_message = request.get_json()
-
-        #for row in client_message:
-        #    row_json = client_message[row]
-        #    print(row_json)
-        #    for card in row_json:
-        #        list_values.append((int)(client_message[row][card]['value']))
-        #        list_suits.append((int)(client_message[row][card]['suit']))
-
-        #list_players = []
-        #test_community_cards = make_community_cards()
-        #player_hand1 = make_player_hands(list_values, list_suits)
-
-        #list_players.append(find_player_hand_types(test_community_cards, player_hand1, "player1"))
-
-        #find_winning_player(list_players)
-
         return jsonify({'post message': client_message})
 
 @app.route("/", methods=['PUT'])
