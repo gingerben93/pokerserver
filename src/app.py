@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 import json
 import logging
+
 #import pokerRuleLogic
 from pokerRuleLogic import Number
 from pokerRuleLogic import Suit
@@ -12,6 +13,9 @@ from pokerRuleLogic import find_player_hand_types
 from pokerRuleLogic import find_winning_player
 from pokerRuleLogic import make_community_cards
 
+from init import create_app
+from models import Users, db
+
 class community_cards:
     def __init__(self, json_dict):
         self.card_values = json_dict['card_values']
@@ -22,6 +26,39 @@ log = logging.getLogger(__name__)
 app = Flask(__name__)
 
 deck = []
+
+#testing db connection
+###########################
+
+app = create_app()
+
+@app.route("/get_all", methods=['GET'])
+def fetch():
+    users = Users.query.all()
+    all_users = []
+    for user in users:
+        new_user = {
+            "user_id": user.user_id,
+            "user_name":  user.user_name,
+            "user_password": user.user_password
+        }
+
+        all_users.append(new_user)
+    return json.dumps(all_users)
+
+@app.route("/add", methods=['POST'])
+def add():
+    user_data = request.get_json()
+
+    name = user_data['user_name']
+    password = user_data['user_password']
+
+    user = Users(user_name = name, user_password = password)
+    db.session.add(user)
+    db.session.commit()
+    return json.dumps("Added User"), 200
+
+###########################
 
 @app.route("/", methods=['GET'])
 def index_get():
