@@ -13,9 +13,6 @@ from pokerRuleLogic import find_player_hand_types
 from pokerRuleLogic import find_winning_player
 from pokerRuleLogic import make_community_cards
 
-from init import create_app
-from models import Users, db
-
 class community_cards:
     def __init__(self, json_dict):
         self.card_values = json_dict['card_values']
@@ -29,6 +26,9 @@ deck = []
 
 #testing db connection
 ###########################
+
+from init import create_app
+from models import Users, Game, Participant, db
 
 app = create_app()
 
@@ -57,6 +57,17 @@ def add():
     db.session.add(user)
     db.session.commit()
     return json.dumps("Added User"), 200
+
+@app.route("/start_game", methods=['GET'])
+def start_game():
+    users = Users.query.all()
+    all_users = []
+    game = Game(round_current = 0, round_max = 3)
+    for user in users:
+        participant = Participant(user_id = user.user_id, game_id = game.game_id, score = 0)
+        db.session.add(participant)
+    db.session.commit()
+    return json.dumps("added " + len(users))
 
 ###########################
 
